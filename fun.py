@@ -14,7 +14,6 @@ for i in range(len(lowerLetters)):
     idx += 1
   else:
     letters += lowerLetters[i]
-print letters
 letterScores = {}
 maxLength = 99
 toMatch = ''
