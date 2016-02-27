@@ -8,7 +8,7 @@ consists of all of the letters you have availiable. Lowercase letters means the 
 Options:
 You can have as many options as you would like. The options consist of:
 
-max word length: 
+Max word length: 
 -<number> 
 The number is the integer of the maximum word length
 ex: "-8" sets the length of the maximum word length to 8
@@ -22,3 +22,11 @@ Matching:
 ^<letters or _>
 This allows you to say that you want a specific format for the word.
 ex: "^__a___" says you want a 6 letter word with a as the 3rd letter of it.
+
+
+More features to come! If there's a feature you are looking for, send me a message at mic082@ucsd.edu and I'll see if it's possible!
+
+Features I'm currently looking into:
+
+Split:
+Allow for your given characters to be split into multiple words and use as many letters as possible.
