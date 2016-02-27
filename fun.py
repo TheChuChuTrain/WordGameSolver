@@ -66,9 +66,6 @@ for l in dict:
         letterIndex += 1
         currIndex += 1
         numMustUsed += 1
-      elif letters[letterIndex].lower() < currLetters[currIndex]:
-        valid = False
-        break
       else:
         valid = False
         break
