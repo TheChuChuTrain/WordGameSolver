@@ -1,3 +1,7 @@
+"""
+Written by Michael Chu
+https://github.com/TheChuChuTrain
+"""
 import sys
 dict = open("sowpods.txt")
 
