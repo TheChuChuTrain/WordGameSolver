@@ -1,0 +1,24 @@
+This is an anagram solver for word puzzle games that has features added to support a wide variety of word games.
+
+Usage: python word-Chu-ser.py <Letters> <Options>*
+
+Letters:
+consists of all of the letters you have availiable. Lowercase letters means the letters provided are optional and uppercase letters means that those letters MUST be used in the final answer.
+
+Options:
+You can have as many options as you would like. The options consist of:
+
+max word length: 
+-<number> 
+The number is the integer of the maximum word length
+ex: "-8" sets the length of the maximum word length to 8
+
+Weighted letters:
+<letter><value>
+Letters by default are given a value of 1. You can say that you want a particular letter more or less by using this.
+ex: "r5" says using the letter r is worth 5 times as much as the deafult value for a letter
+
+Matching:
+^<letters or _>
+This allows you to say that you want a specific format for the word.
+ex: "^__a___" says you want a 6 letter word with a as the 3rd letter of it.
