@@ -33,7 +33,7 @@ for arg in sys.argv[2:]:
   elif arg[0] == '%':
     split = True
   else:
-    letterScores[arg[0].lower()] = int(arg[1:])
+    letterScores[arg[0].lower()] = float(arg[1:])
 
 bestScore = 0
 bestWord = []
