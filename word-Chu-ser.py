@@ -9,13 +9,21 @@ wordList = 'sowpods.txt'
 # parse args
 inputLetters = sys.argv[1]
 letters = inputLetters.replace('-', '')
+
+# number of required wildcards
 wildRequired = len(inputLetters) - len(letters)
 letters = letters.replace('_', '')
+
+# total number of wild cards we have
 numWild = len(inputLetters) - len(letters)
+
+# number of letters we must use
 mustUse = sorted([i for i in letters if i.isupper()])
 lowerLetters = ''.join(sorted(letters.lower()))
 letters = ''
 idx = 0
+
+# We need sorted letters, but keeping uppercase letters
 for i in range(len(lowerLetters)):
   if idx < len(mustUse) and mustUse[idx].lower() == lowerLetters[i]:
     letters += mustUse[idx]
@@ -24,10 +32,13 @@ for i in range(len(lowerLetters)):
     letters += lowerLetters[i]
 letterScores = {}
 maxLength = 99
-toMatch = ''
+minLength = 2
+toMatch = None
 split = False
 wwf = False
 scoreSet = False
+exactLength = None
+cantUse = set()
 
 # Set initial letter scores, the default value for each letter is 1
 for i in range(ord('a'), ord('z') + 1):
@@ -36,11 +47,15 @@ for i in range(ord('a'), ord('z') + 1):
 for arg in sys.argv[2:]:
   if arg[0] == '-':
     maxLength = int(arg[1:])
+  elif arg[0] == '+':
+    minLength = int(arg[1:])
   elif arg[0] == '^':
     toMatch = arg[1:].lower()
-    maxLength = len(toMatch)
+    exactLength = len(toMatch)
   elif arg[0] == '%':
     split = True
+  elif arg[0] == '#':
+    cantUse = set(arg[1:])
   elif arg == 'wwf':
     wwf = True
     scoreSet = True
@@ -54,74 +69,81 @@ if wwf:
 bestScore = 0
 bestWord = []
 
-dict = open(wordList)
+allWords = open(wordList)
 # go through entire dictionary
-for l in dict:
+for l in allWords:
+  valid = True
   l = l.rstrip().lower()
+  if len(l) != exactLength:
+    continue
+  if len(l) > maxLength:
+    continue
+  if len(l) < minLength:
+    continue
+  for i in range(len(l)):
+    if toMatch != None and toMatch[i] != '_' and toMatch[i] != l[i]:
+      valid = False
+      break
+    if l[i] in cantUse:
+      valid = False
+      break
+  if not valid:
+    continue
+
   currLetters = ''.join(sorted(l))
   letterIndex = 0
   currIndex = 0
   currScore = 0
-  valid = True
   numMustUsed = 0
   possibleWild = 0
   wildUsed = 0
-  while True:
-    # not a required letter
-    if letters[letterIndex].islower():
+  # letters is what we need to use(sorted) currLetters is what letters are in the word we're checking.
+  # zip letters together keeping track of how many wild letters we use
+  while valid and currIndex < len(currLetters):
+
+    # if we still have required letters left
+    if letterIndex < len(letters):
       # if the letter matches
-      if letters[letterIndex] == currLetters[currIndex]:
-        currScore += letterScores[letters[letterIndex]]
+      if letters[letterIndex].lower() == currLetters[currIndex]:
+        currScore += letterScores[letters[letterIndex].lower()]
+        if letters[letterIndex].isupper():
+          numMustUsed += 1
         letterIndex += 1
         currIndex += 1
         possibleWild += 1
       # if we have a letter not in the current word
-      elif letters[letterIndex] < currLetters[currIndex]:
+      elif letters[letterIndex].islower() and letters[letterIndex] < currLetters[currIndex]:
         letterIndex += 1
-      # if there's a letter in the word that isn't in our letters
+      # use a wildcard
       elif wildUsed < numWild:
         wildUsed += 1
         currIndex += 1
-      # out of options, not a valid word
+      # no options left
       else:
         valid = False
-        break
-    # required to be used letters
+
+    # no letters left, use wildcards
+    elif wildUsed < numWild:
+      wildUsed += 1
+      currIndex += 1
     else:
-      # if the letter matches
-      if letters[letterIndex].lower() == currLetters[currIndex]:
-        currScore += letterScores[letters[letterIndex].lower()]
-        letterIndex += 1
-        currIndex += 1
-        numMustUsed += 1
-      elif wildUsed < numWild:
-        wildUsed += 1
-        currIndex += 1
-      else:
-        valid = False
-        break
-    # check for the end of the word
-    if letterIndex == len(letters) or currIndex == len(currLetters):
+      valid = False
+
+    # if it is the end of the word
+    if currIndex == len(currLetters):
+      # check for if we've used all of the required options
       if not numMustUsed == len(mustUse) or possibleWild + wildUsed < wildRequired:
         valid = False
-      break
 
   # calculate best scoring words
-  if valid and currIndex == len(currLetters) and len(currLetters) <= maxLength:
-    if currScore > bestScore:
-      bestScore = currScore
-      bestWord = [l]
-    elif currScore == bestScore:
-      bestWord.append(l)
+  if valid and currIndex == len(currLetters):
+    if exactLength is None or len(currLetters) == exactLength:
+      if currScore > bestScore:
+        bestScore = currScore
+        bestWord = [l]
+      elif currScore == bestScore:
+        bestWord.append(l)
 
 print 'Best score:', bestScore
 for word in bestWord:
-  skip = False
-  if len(toMatch) != 0 and len(word) == len(toMatch):
-    for i in range(len(word)):
-      if not toMatch[i] == '_' and not toMatch[i] == word[i]:
-        skip = True
-        break
-  if skip:
-    continue
   print word, len(word)
